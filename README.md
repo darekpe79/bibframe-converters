@@ -31,9 +31,7 @@ Zestaw narzędzi do konwersji metadanych (MARC, Dublin Core) na format BIBFRAME 
         lxml
         pandas
 
-    Możesz też skorzystać z pliku requirements.txt (jeśli go dodasz), wykonując:
 
-    pip install -r requirements.txt
 
 Użycie
 1. Konwersja MARC → MARCXML → BIBFRAME
