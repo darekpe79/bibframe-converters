@@ -1,0 +1,16 @@
+{
+  "identifier": "dc:identifier",
+  "link": "dc:relation",
+  "type": "dc:type",
+  "title": "dc:title",
+  "creator": "dc:creator",
+  "author_gender": "dc:author_gender",
+  "journal_title": "dc:source",
+  "source_number": "dc:source_number",
+  "source_place": "dc:source_place",
+  "source_date": "dc:source_date",
+  "date": "dc:date",
+  "publication_place": "dc:publication_place",
+  "pages": "dc:pages",
+  "open_access": "dc:open_access"
+}

@@ -1,0 +1,84 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<rdf:RDF xmlns:bf="http://id.loc.gov/ontologies/bibframe/" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" xmlns:bflc="http://id.loc.gov/ontologies/bflc/" xmlns:madsrdf="http://www.loc.gov/mads/rdf/v1#" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <bf:Work rdf:about="http://example.org/1_1_1867_Wislicki_Groch">
+    <bf:adminMetadata>
+      <bf:AdminMetadata>
+        <bf:status>
+          <bf:Status rdf:about="http://id.loc.gov/vocabulary/mstatus/n">
+            <rdfs:label>new</rdfs:label>
+          </bf:Status>
+        </bf:status>
+        <bf:date rdf:datatype="http://www.w3.org/2001/XMLSchema#date">2025-01-20</bf:date>
+      </bf:AdminMetadata>
+    </bf:adminMetadata>
+    <bf:title>
+      <bf:Title>
+        <bf:mainTitle>Groch na ścianę. Parę słów do całej plejady zapoznanych wieszczów naszych</bf:mainTitle>
+      </bf:Title>
+    </bf:title>
+    <bf:contribution>
+      <bf:Contribution>
+        <bf:agent>
+          <bf:Agent>
+            <rdfs:label>Adam Wyślicki</rdfs:label>
+          </bf:Agent>
+        </bf:agent>
+        <bf:role rdf:resource="http://id.loc.gov/vocabulary/relators/aut"/>
+      </bf:Contribution>
+    </bf:contribution>
+    <bf:genreForm>
+      <bf:GenreForm>
+        <rdfs:label>chapter</rdfs:label>
+      </bf:GenreForm>
+    </bf:genreForm>
+    <bf:identifiedBy>
+      <bf:Identifier>
+        <rdf:value>https://drive.google.com/file/d/1QlZE1BY3S8EkMBV9VtxNiuSljzdvXQ8B</rdf:value>
+      </bf:Identifier>
+    </bf:identifiedBy>
+    <bf:provisionActivity>
+      <bf:ProvisionActivity>
+        <bf:date>1867</bf:date>
+      </bf:ProvisionActivity>
+    </bf:provisionActivity>
+    <bf:note>
+      <bf:Note>
+        <rdfs:label>Source number: 32</rdfs:label>
+      </bf:Note>
+    </bf:note>
+    <bf:relation>
+      <bf:Relation>
+        <bf:relationship rdf:resource="http://id.loc.gov/vocabulary/relationship/partof"/>
+        <bf:associatedResource>
+          <bf:Work rdf:about="http://example.org/journal-Programy i dyskusje literackie pozytywizmu">
+            <bf:title>
+              <bf:Title>
+                <bf:mainTitle>Programy i dyskusje literackie pozytywizmu</bf:mainTitle>
+              </bf:Title>
+            </bf:title>
+            <bf:hasInstance>
+              <bf:Instance rdf:about="http://example.org/journal-instance-Programy i dyskusje literackie pozytywizmu">
+                <bf:title>
+                  <bf:Title>
+                    <bf:mainTitle>Programy i dyskusje literackie pozytywizmu</bf:mainTitle>
+                  </bf:Title>
+                </bf:title>
+                <bf:instanceOf rdf:resource="http://example.org/journal-Programy i dyskusje literackie pozytywizmu"/>
+                <bf:part>Pages 44638</bf:part>
+                <bf:hasItem>
+                  <bf:Item rdf:about="http://example.org/journal-item-Programy i dyskusje literackie pozytywizmu">
+                    <bf:heldBy>
+                      <bf:Agent>
+                        <rdfs:label>Local Library</rdfs:label>
+                      </bf:Agent>
+                    </bf:heldBy>
+                  </bf:Item>
+                </bf:hasItem>
+              </bf:Instance>
+            </bf:hasInstance>
+          </bf:Work>
+        </bf:associatedResource>
+      </bf:Relation>
+    </bf:relation>
+  </bf:Work>
+</rdf:RDF>
