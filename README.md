@@ -78,8 +78,7 @@ Ważne uwagi
 
 Kontakt i licencja
 
-    Autor: darek (lub wstaw imię/nazwę zespołu).
-    Kod dostępny na licencji MIT (lub innej), do użytku i modyfikacji.
+    Autor: darek .
     W razie pytań: proszę zgłaszać Issues w repozytorium GitHub.
 
 Dzięki za korzystanie z BIBFRAME Converters! Zachęcam do forka, testowania i zgłaszania uwag/poprawek.
