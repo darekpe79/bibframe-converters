@@ -1,0 +1,120 @@
+{
+  "identifier": {
+    "tag": "001"
+  },
+
+  "link": {
+    "tag": "856",
+    "indicators": ["4","0"],
+    "subfields": [
+      { "code": "u", "sourceCol": "currentColumn" }
+    ]
+  },
+
+  "type": {
+    "tag": "655",
+    "indicators": [" "," "],
+    "subfields": [
+      { "code": "a", "sourceCol": "currentColumn" }
+    ]
+  },
+
+  "title": {
+    "tag": "245",
+    "indicators": ["1","0"],
+    "subfields": [
+      { "code": "a", "sourceCol": "currentColumn" }
+    ]
+  },
+
+  "creator": {
+    "tag": "100",
+    "indicators": ["1"," "],
+    "subfields": [
+      { "code": "a", "sourceCol": "currentColumn" }
+    ]
+  },
+
+  "journal_title": {
+    "tag": "773",
+    "indicators": ["0"," "],
+    "subfields": [
+      { "code": "t", "sourceCol": "currentColumn" }
+    ]
+  },
+
+  "source_number": {
+    "tag": "773",
+    "indicators": ["0"," "],
+    "subfields": [
+      { "code": "g", "sourceCol": "currentColumn" }
+    ]
+  },
+
+  "source_place": {
+    "tag": "264",
+    "indicators": [" ","1"],
+    "subfields": [
+      { "code": "a", "sourceCol": "currentColumn" }
+    ]
+  },
+
+  "source_date": {
+    "tag": "264",
+    "indicators": [" ","1"],
+    "subfields": [
+      { "code": "c", "sourceCol": "currentColumn" }
+    ]
+  },
+
+  "date": {
+    "tag": "264",
+    "indicators": [" ","1"],
+    "subfields": [
+      { "code": "c", "sourceCol": "currentColumn" }
+    ]
+  },
+
+  "publication_place": {
+    "tag": "264",
+    "indicators": [" ","1"],
+    "subfields": [
+      { "code": "a", "sourceCol": "currentColumn" }
+    ]
+  },
+
+  "pages": {
+    "tag": "300",
+    "indicators": [" "," "],
+    "subfields": [
+      { "code": "a", "sourceCol": "currentColumn" }
+    ]
+  },
+
+  "open_access": {
+    "tag": "506",
+    "indicators": [" "," "],
+    "subfields": [
+      { "code": "a", "sourceCol": "currentColumn" }
+    ]
+  },
+
+  "subjects": {
+    "tag": "650",
+    "indicators": [" ","0"],
+    "repeated": true,
+    "subfields": [
+      { "code": "a", "sourceCol": "currentColumn" }
+    ]
+  },
+
+  "genre": {
+    "tag": "655",
+    "indicators": [" "," "],
+    "repeated": true,
+    "subfields": [
+      { "code": "a", "sourceCol": "currentColumn" }
+    ]
+  }
+}
+
