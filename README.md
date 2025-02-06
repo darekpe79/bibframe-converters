@@ -7,6 +7,7 @@ Zestaw narzędzi do konwersji metadanych (MARC, Dublin Core) na format BIBFRAME 
 - **`scripts/`**  
   - `marc_to_bibframe.py` – kod w Pythonie do konwersji MARC → MARCXML (przy pomocy [pymarc](https://github.com/edsu/pymarc)) oraz MARCXML → BIBFRAME (wykorzystuje XSLT LoC).
   - `dc_to_bibframe.py` – kod w Pythonie do konwersji metadanych z Pandas DataFrame → Dublin Core XML, a następnie DC XML → BIBFRAME (za pomocą własnego XSLT `DC_to_bibframe.xsl`).
+  - `DF_to_Marc21.py` – Data Frame to marc21- faza wstępna
   
 - **`xsl/`**  
   - `marc2bibframe2.xsl` oraz inne pliki w stylu `ConvSpec-...xsl` – oficjalne arkusze XSLT używane przez Library of Congress do przetwarzania MARCXML na BIBFRAME.  
