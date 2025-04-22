@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsl:stylesheet version="1.0"
+<xsl:stylesheet
+    version="1.0"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
@@ -9,281 +10,195 @@
     xmlns:dc="http://purl.org/dc/elements/1.1/"
     exclude-result-prefixes="xsl">
 
-  <!-- Parametr z przykładową datą przetworzenia (np. 2025-01-20).
-       Możesz nadpisać go z Python (etree.XSLT) lub ustawić "na sztywno". -->
-  <xsl:param name="currentDate" select="'2025-01-20'"/>
+	<xsl:param name="currentDate" select="'2025-03-30'"/>
+	<xsl:output method="xml" indent="yes" encoding="UTF-8"/>
+	<xsl:strip-space elements="*"/>
 
-  <xsl:output method="xml" indent="yes" encoding="UTF-8"/>
-  <xsl:strip-space elements="*"/>
+	<!-- ===== KLUCZE ===== -->
+	<xsl:key name="authorsByName" match="dc:creator" use="normalize-space(.)"/>
+	<xsl:key name="journalByISSN" match="article" use="normalize-space(dc:source_issn)"/>
+	<xsl:key name="articlesByID" match="article" use="normalize-space(dc:identifier)"/>
+	<xsl:key name="journalIssueByNumber" match="article"
+			 use="concat(normalize-space(dc:source_issn), '|', normalize-space(dc:source_number))"/>
 
-  <!-- ===================================================================
-       GŁÓWNY SZABLON: generujemy <rdf:RDF> i przetwarzamy <article>.
-     =================================================================== -->
-  <xsl:template match="/">
-    <rdf:RDF
-      xmlns:bf="http://id.loc.gov/ontologies/bibframe/"
-      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-      xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
-      xmlns:bflc="http://id.loc.gov/ontologies/bflc/"
-      xmlns:madsrdf="http://www.loc.gov/mads/rdf/v1#">
-      
-      <!-- Przetwarzaj każdy <article> osobno -->
-      <xsl:apply-templates select="articles/article"/>
-      
-    </rdf:RDF>
-  </xsl:template>
+	<!-- ===== GŁÓWNY SZABLON ===== -->
+	<xsl:template match="/">
+		<rdf:RDF>
 
-  <!-- ===================================================================
-       SZABLON DLA POJEDYNCZEGO <article> -> tworzymy bf:Work
-     =================================================================== -->
-  <xsl:template match="article">
-    
-    <bf:Work rdf:about="http://example.org/{dc:identifier}">
-      
-      <!-- Przykład bf:adminMetadata (opcjonalnie) -->
-      <bf:adminMetadata>
-        <bf:AdminMetadata>
-          <bf:status>
-            <bf:Status rdf:about="http://id.loc.gov/vocabulary/mstatus/n">
-              <rdfs:label>new</rdfs:label>
-            </bf:Status>
-          </bf:status>
-          <!-- Wstawiamy datę z parametru $currentDate -->
-          <bf:date rdf:datatype="http://www.w3.org/2001/XMLSchema#date">
-            <xsl:value-of select="$currentDate"/>
-          </bf:date>
-        </bf:AdminMetadata>
-      </bf:adminMetadata>
+			<!-- A) Autorzy -->
+			<xsl:apply-templates select="articles/article/dc:creator[normalize-space(.) and generate-id() = generate-id(key('authorsByName', normalize-space(.))[1])]"/>
 
-      <!-- Tytuł (dc:title) -->
-      <bf:title>
-        <bf:Title>
-          <bf:mainTitle>
-            <xsl:value-of select="dc:title"/>
-          </bf:mainTitle>
-        </bf:Title>
-      </bf:title>
+			<!-- B) Czasopismo -->
+			<xsl:apply-templates select="articles/article[normalize-space(dc:source_issn) and generate-id() = generate-id(key('journalByISSN', normalize-space(dc:source_issn))[1])]">
+				<xsl:with-param name="mode" select="'journal'"/>
+			</xsl:apply-templates>
 
-      <!-- Autor (dc:creator) z rolą aut -->
-      <bf:contribution>
-        <bf:Contribution>
-          <bf:agent>
-            <bf:Agent>
-              <rdfs:label>
-                <xsl:value-of select="dc:creator"/>
-              </rdfs:label>
-            </bf:Agent>
-          </bf:agent>
-          <bf:role rdf:resource="http://id.loc.gov/vocabulary/relators/aut"/>
-        </bf:Contribution>
-      </bf:contribution>
+			<!-- C) Artykuły -->
+			<xsl:apply-templates select="articles/article[generate-id() = generate-id(key('articlesByID', normalize-space(dc:identifier))[1])]">
+				<xsl:with-param name="mode" select="'article'"/>
+			</xsl:apply-templates>
 
-      <!-- Typ (dc:type) -> bf:genreForm -->
-      <xsl:if test="normalize-space(dc:type)">
-        <bf:genreForm>
-          <bf:GenreForm>
-            <rdfs:label>
-              <xsl:value-of select="dc:type"/>
-            </rdfs:label>
-          </bf:GenreForm>
-        </bf:genreForm>
-      </xsl:if>
+		</rdf:RDF>
+	</xsl:template>
 
-      <!-- Link (dc:relation) -> bf:identifiedBy/bf:Identifier -->
-      <xsl:if test="normalize-space(dc:relation)">
-        <bf:identifiedBy>
-          <bf:Identifier>
-            <rdf:value>
-              <xsl:value-of select="dc:relation"/>
-            </rdf:value>
-          </bf:Identifier>
-        </bf:identifiedBy>
-      </xsl:if>
+	<!-- ===== AUTOR ===== -->
+	<xsl:template match="dc:creator">
+		<bf:Agent rdf:about="http://example.org/agent/{translate(normalize-space(.), ' ', '_')}">
+			<rdfs:label>
+				<xsl:value-of select="normalize-space(.)"/>
+			</rdfs:label>
+		</bf:Agent>
+	</xsl:template>
 
-      <!-- Data artykułu (dc:date) -> bf:provisionActivity/bf:date -->
-      <xsl:if test="normalize-space(dc:date)">
-        <bf:provisionActivity>
-          <bf:ProvisionActivity>
-            <bf:date>
-              <xsl:value-of select="dc:date"/>
-            </bf:date>
-          </bf:ProvisionActivity>
-        </bf:provisionActivity>
-      </xsl:if>
+	<!-- ===== SZABLON ARTYKUŁU LUB CZASOPISMA ===== -->
+	<xsl:template match="article">
+		<xsl:param name="mode" select="''"/>
 
-      <!-- Miejsce publikacji (dc:publication_place) -->
-      <xsl:if test="normalize-space(dc:publication_place)">
-        <bf:provisionActivity>
-          <bf:ProvisionActivity>
-            <bf:place>
-              <bf:Place>
-                <rdfs:label>
-                  <xsl:value-of select="dc:publication_place"/>
-                </rdfs:label>
-              </bf:Place>
-            </bf:place>
-          </bf:ProvisionActivity>
-        </bf:provisionActivity>
-      </xsl:if>
+		<!-- CZASOPISMO -->
+		<xsl:if test="$mode='journal'">
+			<bf:Work rdf:about="http://example.org/journal/issn/{normalize-space(dc:source_issn)}">
+				<bf:adminMetadata>
+					<bf:AdminMetadata>
+						<bf:date rdf:datatype="http://www.w3.org/2001/XMLSchema#date">
+							<xsl:value-of select="$currentDate"/>
+						</bf:date>
+					</bf:AdminMetadata>
+				</bf:adminMetadata>
 
-      <!-- OPCJONALNY JĘZYK (dc:language) -> bf:language/bf:Language -->
-      <xsl:if test="normalize-space(dc:language)">
-        <bf:language>
-          <bf:Language rdf:about="http://id.loc.gov/vocabulary/languages/{normalize-space(dc:language)}">
-            <rdfs:label>
-              <xsl:value-of select="normalize-space(dc:language)"/>
-            </rdfs:label>
-          </bf:Language>
-        </bf:language>
-      </xsl:if>
+				<bf:title>
+					<bf:Title>
+						<bf:mainTitle>
+							<xsl:value-of select="key('journalByISSN', normalize-space(dc:source_issn))[1]/dc:source"/>
+						</bf:mainTitle>
+					</bf:Title>
+				</bf:title>
 
-      <!-- open_access (dc:open_access) -> bflc:accessPolicy,
-           ALE TYLKO JEŚLI != 'FAŁSZ' I != puste  -->
-      <xsl:if test="normalize-space(dc:open_access) != 'FAŁSZ' 
-                    and normalize-space(dc:open_access) != ''">
-        <bflc:accessPolicy>
-          <rdfs:label>
-            <xsl:value-of select="dc:open_access"/>
-          </rdfs:label>
-        </bflc:accessPolicy>
-      </xsl:if>
+				<bf:identifiedBy>
+					<bf:Identifier>
+						<rdf:value>
+							<xsl:value-of select="normalize-space(dc:source_issn)"/>
+						</rdf:value>
+						<bf:identifierScheme>issn</bf:identifierScheme>
+					</bf:Identifier>
+				</bf:identifiedBy>
 
-      <!-- Example notatki: source_number (dc:source_number) -->
-      <xsl:if test="normalize-space(dc:source_number)">
-        <bf:note>
-          <bf:Note>
-            <rdfs:label>
-              <xsl:text>Source number: </xsl:text>
-              <xsl:value-of select="dc:source_number"/>
-            </rdfs:label>
-          </bf:Note>
-        </bf:note>
-      </xsl:if>
+				<!-- Numery czasopisma -->
+				<xsl:for-each select="key('journalByISSN', normalize-space(dc:source_issn))">
+					<xsl:variable name="currentNumber" select="normalize-space(dc:source_number)" />
+					<xsl:if test="position() = 1 or not(preceding-sibling::article[normalize-space(dc:source_number) = $currentNumber])">
+						<xsl:if test="normalize-space(dc:source_number) != ''">
+							<bf:hasInstance>
+								<bf:Instance rdf:about="http://example.org/journal-instance/issn/{normalize-space(dc:source_issn)}/num/{$currentNumber}">
+									<bf:identifiedBy>
+										<bf:Identifier>
+											<rdf:value>
+												<xsl:value-of select="$currentNumber"/>
+											</rdf:value>
+											<bf:identifierScheme>issue number</bf:identifierScheme>
+										</bf:Identifier>
+									</bf:identifiedBy>
+								</bf:Instance>
+							</bf:hasInstance>
+						</xsl:if>
+					</xsl:if>
+				</xsl:for-each>
+			</bf:Work>
+		</xsl:if>
 
-      <!-- OPCJONALNIE: subject -> bf:subject/bf:Topic -->
-      <xsl:for-each select="dc:subject">
-        <xsl:if test="normalize-space(.)">
-          <bf:subject>
-            <bf:Topic>
-              <rdfs:label>
-                <xsl:value-of select="normalize-space(.)"/>
-              </rdfs:label>
-              <!-- Jeżeli chcesz, możesz dopisać:
-                   <madsrdf:authoritativeLabel> ... </madsrdf:authoritativeLabel> -->
-            </bf:Topic>
-          </bf:subject>
-        </xsl:if>
-      </xsl:for-each>
+		<!-- ARTYKUŁ -->
+		<xsl:if test="$mode='article'">
+			<bf:Work rdf:about="http://example.org/article/{normalize-space(dc:identifier)}">
+				<bf:adminMetadata>
+					<bf:AdminMetadata>
+						<bf:status>
+							<bf:Status rdf:about="http://id.loc.gov/vocabulary/mstatus/n">
+								<rdfs:label>new</rdfs:label>
+							</bf:Status>
+						</bf:status>
+						<bf:date rdf:datatype="http://www.w3.org/2001/XMLSchema#date">
+							<xsl:value-of select="$currentDate"/>
+						</bf:date>
+					</bf:AdminMetadata>
+				</bf:adminMetadata>
 
-      <!-- RELACJA: artykuł jest częścią czasopisma (dc:source) -->
-      <xsl:if test="normalize-space(dc:source)">
-        <bf:relation>
-          <bf:Relation>
-            <bf:relationship rdf:resource="http://id.loc.gov/vocabulary/relationship/partof"/>
-            <bf:associatedResource>
-              <!-- Poziom Work dla czasopisma -->
-              <bf:Work rdf:about="http://example.org/journal-{dc:source}">
-                <bf:title>
-                  <bf:Title>
-                    <bf:mainTitle>
-                      <xsl:value-of select="dc:source"/>
-                    </bf:mainTitle>
-                  </bf:Title>
-                </bf:title>
+				<bf:title>
+					<bf:Title>
+						<bf:mainTitle>
+							<xsl:value-of select="dc:title"/>
+						</bf:mainTitle>
+					</bf:Title>
+				</bf:title>
 
-                <!-- Na poziomie Work tworzymy Instance -->
-                <bf:hasInstance>
-                  <bf:Instance rdf:about="http://example.org/journal-instance-{dc:source}">
-                    <bf:title>
-                      <bf:Title>
-                        <bf:mainTitle>
-                          <xsl:value-of select="dc:source"/>
-                        </bf:mainTitle>
-                      </bf:Title>
-                    </bf:title>
-                    <bf:instanceOf rdf:resource="http://example.org/journal-{dc:source}"/>
+				<xsl:for-each select="dc:creator[normalize-space(.)]">
+					<bf:contribution>
+						<bf:Contribution>
+							<bf:agent rdf:resource="http://example.org/agent/{translate(normalize-space(.), ' ', '_')}"/>
+							<bf:role rdf:resource="http://id.loc.gov/vocabulary/relators/aut"/>
+						</bf:Contribution>
+					</bf:contribution>
+				</xsl:for-each>
 
-                    <!-- Można dodać source_date, source_place, jeśli w DC -->
-                    <xsl:if test="normalize-space(dc:source_date) or normalize-space(dc:source_place)">
-                      <bf:provisionActivity>
-                        <bf:ProvisionActivity>
-                          <xsl:if test="normalize-space(dc:source_date)">
-                            <bf:date>
-                              <xsl:value-of select="dc:source_date"/>
-                            </bf:date>
-                          </xsl:if>
-                          <xsl:if test="normalize-space(dc:source_place)">
-                            <bf:place>
-                              <bf:Place>
-                                <rdfs:label>
-                                  <xsl:value-of select="dc:source_place"/>
-                                </rdfs:label>
-                              </bf:Place>
-                            </bf:place>
-                          </xsl:if>
-                        </bf:ProvisionActivity>
-                      </bf:provisionActivity>
-                    </xsl:if>
+				<xsl:if test="normalize-space(dc:type)">
+					<bf:genreForm>
+						<bf:GenreForm>
+							<rdfs:label>
+								<xsl:value-of select="dc:type"/>
+							</rdfs:label>
+						</bf:GenreForm>
+					</bf:genreForm>
+				</xsl:if>
 
-                    <!-- Tom, numer, strony (volume, issue, pages) -->
-                    <bf:part>
-                      <xsl:choose>
-                        <xsl:when test="normalize-space(dc:volume) 
-                                        or normalize-space(dc:issue) 
-                                        or normalize-space(dc:pages)">
-                          <!-- volume -->
-                          <xsl:if test="normalize-space(dc:volume)">
-                            <xsl:text>Vol. </xsl:text>
-                            <xsl:value-of select="normalize-space(dc:volume)"/>
-                          </xsl:if>
+				<xsl:if test="normalize-space(dc:relation)">
+					<bf:identifiedBy>
+						<bf:Identifier>
+							<rdf:value>
+								<xsl:value-of select="dc:relation"/>
+							</rdf:value>
+						</bf:Identifier>
+					</bf:identifiedBy>
+				</xsl:if>
 
-                          <!-- issue -->
-                          <xsl:if test="normalize-space(dc:issue)">
-                            <!-- przecinek, jeśli volume niepuste -->
-                            <xsl:if test="normalize-space(dc:volume)">
-                              <xsl:text>, </xsl:text>
-                            </xsl:if>
-                            <xsl:text>Issue </xsl:text>
-                            <xsl:value-of select="normalize-space(dc:issue)"/>
-                          </xsl:if>
+				<xsl:if test="normalize-space(dc:date)">
+					<bf:provisionActivity>
+						<bf:ProvisionActivity>
+							<bf:date>
+								<xsl:value-of select="dc:date"/>
+							</bf:date>
+						</bf:ProvisionActivity>
+					</bf:provisionActivity>
+				</xsl:if>
 
-                          <!-- pages -->
-                          <xsl:if test="normalize-space(dc:pages)">
-                            <!-- przecinek, jeśli volume lub issue niepuste -->
-                            <xsl:if test="normalize-space(dc:volume) or normalize-space(dc:issue)">
-                              <xsl:text>, </xsl:text>
-                            </xsl:if>
-                            <xsl:text>Pages </xsl:text>
-                            <xsl:value-of select="normalize-space(dc:pages)"/>
-                          </xsl:if>
-                        </xsl:when>
-                        <xsl:otherwise>
-                          <xsl:text>No volume, issue, or pages provided.</xsl:text>
-                        </xsl:otherwise>
-                      </xsl:choose>
-                    </bf:part>
+				<xsl:if test="normalize-space(dc:open_access) != 'FAŁSZ' and normalize-space(dc:open_access) != ''">
+					<bflc:accessPolicy>
+						<rdfs:label>
+							<xsl:value-of select="dc:open_access"/>
+						</rdfs:label>
+					</bflc:accessPolicy>
+				</xsl:if>
 
-                    <!-- Item w bibliotece -->
-                    <bf:hasItem>
-                      <bf:Item rdf:about="http://example.org/journal-item-{dc:source}">
-                        <bf:heldBy>
-                          <bf:Agent>
-                            <rdfs:label>Local Library</rdfs:label>
-                          </bf:Agent>
-                        </bf:heldBy>
-                      </bf:Item>
-                    </bf:hasItem>
+				<xsl:if test="normalize-space(dc:pages)">
+					<bf:note>
+						<bf:Note>
+							<rdfs:label>
+								<xsl:text>Pages: </xsl:text>
+								<xsl:value-of select="dc:pages"/>
+							</rdfs:label>
+						</bf:Note>
+					</bf:note>
+				</xsl:if>
 
-                  </bf:Instance>
-                </bf:hasInstance>
-
-              </bf:Work>
-            </bf:associatedResource>
-          </bf:Relation>
-        </bf:relation>
-      </xsl:if>
-
-    </bf:Work>
-  </xsl:template>
+				<xsl:if test="normalize-space(dc:source_issn)">
+					<bf:relation>
+						<bf:Relation>
+							<bf:relationship rdf:resource="http://id.loc.gov/vocabulary/relationship/partOf"/>
+							<bf:associatedResource>
+								<bf:Work rdf:about="http://example.org/journal/issn/{normalize-space(dc:source_issn)}"/>
+							</bf:associatedResource>
+						</bf:Relation>
+					</bf:relation>
+				</xsl:if>
+			</bf:Work>
+		</xsl:if>
+	</xsl:template>
 
 </xsl:stylesheet>

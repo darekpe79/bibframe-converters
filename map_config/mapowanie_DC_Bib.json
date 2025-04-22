@@ -4,8 +4,10 @@
   "type": "dc:type",
   "title": "dc:title",
   "creator": "dc:creator",
+  "contributor": "dc:contributor",
   "author_gender": "dc:author_gender",
   "journal_title": "dc:source",
+  "journal_issn": "dc:source_issn",
   "source_number": "dc:source_number",
   "source_place": "dc:source_place",
   "source_date": "dc:source_date",
@@ -14,3 +16,5 @@
   "pages": "dc:pages",
   "open_access": "dc:open_access"
 }
+
+
