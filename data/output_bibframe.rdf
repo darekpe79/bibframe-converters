@@ -12,18 +12,27 @@
       </bf:Issn>
     </bf:identifiedBy>
     <bf:hasInstance>
-      <bf:Instance rdf:about="http://example.org/journal-instance/1234-5678/num/32"/>
+      <bf:Instance rdf:about="http://example.org/journal-instance/1234-5678/num/32">
+        <bf:provisionActivity>
+          <bf:ProvisionActivity>
+            <bf:date>1867</bf:date>
+            <bf:place>
+              <bf:Place>
+                <rdfs:label>warsaw</rdfs:label>
+              </bf:Place>
+            </bf:place>
+          </bf:ProvisionActivity>
+        </bf:provisionActivity>
+        <bf:enumerationAndChronology>
+          <bf:EnumerationAndChronology>
+            <bf:enumeration>32</bf:enumeration>
+          </bf:EnumerationAndChronology>
+        </bf:enumerationAndChronology>
+        <bf:usageAndAccessPolicy>OA</bf:usageAndAccessPolicy>
+        <bf:instanceOf rdf:resource="http://example.org/journal/issn/1234-5678"/>
+      </bf:Instance>
     </bf:hasInstance>
   </bf:Work>
-  <bf:Instance rdf:about="http://example.org/journal-instance/1234-5678/num/32">
-    <bf:enumerationAndChronology>
-      <bf:EnumerationAndChronology>
-        <bf:enumeration>32</bf:enumeration>
-        <bf:chronology>1867</bf:chronology>
-      </bf:EnumerationAndChronology>
-    </bf:enumerationAndChronology>
-    <bf:instanceOf rdf:resource="http://example.org/journal/issn/1234-5678"/>
-  </bf:Instance>
   <bf:Agent rdf:about="http://example.org/agent/Adam_Wyślicki">
     <rdfs:label>Adam Wyślicki</rdfs:label>
   </bf:Agent>
@@ -33,7 +42,6 @@
         <bf:mainTitle>Groch na ścianę. Parę słów do całej plejady zapoznanych wieszczów naszych</bf:mainTitle>
       </bf:Title>
     </bf:title>
-    <bf:partOf rdf:resource="http://example.org/journal-instance/1234-5678/num/32"/>
     <bf:contribution>
       <bf:Contribution>
         <bf:agent rdf:resource="http://example.org/agent/Adam_Wyślicki"/>
@@ -42,19 +50,31 @@
         </bf:role>
       </bf:Contribution>
     </bf:contribution>
-    <bf:extent>
-      <bf:Extent>
-        <rdf:value>44638</rdf:value>
-      </bf:Extent>
-    </bf:extent>
+    <bf:genreForm>
+      <bf:GenreForm>
+        <rdfs:label>chapter</rdfs:label>
+      </bf:GenreForm>
+    </bf:genreForm>
+    <bf:hasInstance>
+      <bf:Instance rdf:about="http://example.org/instance/article/1_1_1867_Wislicki_Groch">
+        <bf:instanceOf rdf:resource="http://example.org/article/1_1_1867_Wislicki_Groch"/>
+        <bf:partOf rdf:resource="http://example.org/journal-instance/1234-5678/num/32"/>
+        <bf:extent>
+          <bf:Extent>
+            <rdf:value>446-38</rdf:value>
+          </bf:Extent>
+        </bf:extent>
+        <bf:electronicLocator>https://drive.google.com/file/d/1QlZE1BY3S8EkMBV9VtxNiuSljzdvXQ8B</bf:electronicLocator>
+        <bf:usageAndAccessPolicy>OA</bf:usageAndAccessPolicy>
+      </bf:Instance>
+    </bf:hasInstance>
   </bf:Work>
   <bf:Work rdf:about="http://example.org/article/1_1_1867_Wislicki_Groch_2">
     <bf:title>
       <bf:Title>
-        <bf:mainTitle>Groch na ścianę. Parę słów do całej plejady zapoznanych wieszczów naszych</bf:mainTitle>
+        <bf:mainTitle>Groch na ścianę. Parę słów do całej plejady zapoznanych wieszczów naszych2</bf:mainTitle>
       </bf:Title>
     </bf:title>
-    <bf:partOf rdf:resource="http://example.org/journal-instance/1234-5678/num/32"/>
     <bf:contribution>
       <bf:Contribution>
         <bf:agent rdf:resource="http://example.org/agent/Adam_Wyślicki"/>
@@ -63,5 +83,23 @@
         </bf:role>
       </bf:Contribution>
     </bf:contribution>
+    <bf:genreForm>
+      <bf:GenreForm>
+        <rdfs:label>article</rdfs:label>
+      </bf:GenreForm>
+    </bf:genreForm>
+    <bf:hasInstance>
+      <bf:Instance rdf:about="http://example.org/instance/article/1_1_1867_Wislicki_Groch_2">
+        <bf:instanceOf rdf:resource="http://example.org/article/1_1_1867_Wislicki_Groch_2"/>
+        <bf:partOf rdf:resource="http://example.org/journal-instance/1234-5678/num/32"/>
+        <bf:extent>
+          <bf:Extent>
+            <rdf:value>4462-382</rdf:value>
+          </bf:Extent>
+        </bf:extent>
+        <bf:electronicLocator>https://drive.google.com/file/d/1QlZE1BY3S8EkMBV9VtxNiuSljzdvXQ8B</bf:electronicLocator>
+        <bf:usageAndAccessPolicy>NOT OA</bf:usageAndAccessPolicy>
+      </bf:Instance>
+    </bf:hasInstance>
   </bf:Work>
 </rdf:RDF>

@@ -106,7 +106,7 @@ if __name__ == "__main__":
         "type": ["chapter", "article"],
         "title": [
             "Groch na ścianę. Parę słów do całej plejady zapoznanych wieszczów naszych",
-            "Groch na ścianę. Parę słów do całej plejady zapoznanych wieszczów naszych"
+            "Groch na ścianę. Parę słów do całej plejady zapoznanych wieszczów naszych2"
         ],
         "creator": ["Adam Wyślicki", "Adam Wyślicki"],
         "author_gender": ["mężczyzna", "mężczyzna"],
@@ -116,12 +116,12 @@ if __name__ == "__main__":
         ],
         "journal_issn": ["1234-5678", "1234-5678"],  # <-- NOWE POLE!
         "source_number": ["32", "32"],
-        "source_place": ["", ""],
+        "source_place": ["warsaw", ""],
         "source_date": ["1867", "2090"],
         "date": ["1867", "2090"],
         "publication_place": ["", ""],
-        "pages": ["44638", ""],
-        "open_access": ["FAŁSZ", ""]
+        "pages": ["446-38", "4462-382"],
+        "open_access": ["OA", "NOT OA"]
     }
 
     data = {

@@ -12,6 +12,7 @@
 	<!-- Klucze -->
 	<xsl:key name="journalByISSN" match="article" use="normalize-space(dc:source_issn)"/>
 	<xsl:key name="creatorKey" match="dc:creator" use="normalize-space(.)"/>
+	<xsl:key name="contributorKey" match="dc:contributor" use="normalize-space(.)"/>
 	<xsl:key name="issueKey" match="article" use="concat(normalize-space(dc:source_issn), '|', normalize-space(dc:source_number))"/>
 
 	<xsl:template match="/">
@@ -39,7 +40,7 @@
 						</bf:Issn>
 					</bf:identifiedBy>
 
-					<!-- Wszystkie instancje -->
+					<!-- Instancje czasopisma -->
 					<xsl:for-each select="/articles/article[dc:source_issn = current()/dc:source_issn]">
 						<xsl:if test="generate-id() = generate-id(key('issueKey', concat(normalize-space(dc:source_issn), '|', normalize-space(dc:source_number)))[1])">
 							<bf:hasInstance>
@@ -50,6 +51,50 @@
 										<xsl:text>/num/</xsl:text>
 										<xsl:value-of select="normalize-space(dc:source_number)"/>
 									</xsl:attribute>
+
+									<xsl:if test="normalize-space(dc:date) or normalize-space(dc:source_place)">
+										<bf:provisionActivity>
+											<bf:ProvisionActivity>
+												<xsl:if test="normalize-space(dc:date)">
+													<bf:date>
+														<xsl:value-of select="normalize-space(dc:date)"/>
+													</bf:date>
+												</xsl:if>
+												<xsl:if test="normalize-space(dc:source_place)">
+													<bf:place>
+														<bf:Place>
+															<rdfs:label>
+																<xsl:value-of select="normalize-space(dc:source_place)"/>
+															</rdfs:label>
+														</bf:Place>
+													</bf:place>
+												</xsl:if>
+											</bf:ProvisionActivity>
+										</bf:provisionActivity>
+									</xsl:if>
+
+									<bf:enumerationAndChronology>
+										<bf:EnumerationAndChronology>
+											<xsl:if test="normalize-space(dc:source_number)">
+												<bf:enumeration>
+													<xsl:value-of select="normalize-space(dc:source_number)"/>
+												</bf:enumeration>
+											</xsl:if>
+											<xsl:if test="normalize-space(dc:source_date)">
+												<bf:chronology>
+													<xsl:value-of select="normalize-space(dc:source_date)"/>
+												</bf:chronology>
+											</xsl:if>
+										</bf:EnumerationAndChronology>
+									</bf:enumerationAndChronology>
+
+									<xsl:if test="normalize-space(dc:open_access)">
+										<bf:usageAndAccessPolicy>
+											<xsl:value-of select="normalize-space(dc:open_access)"/>
+										</bf:usageAndAccessPolicy>
+									</xsl:if>
+
+									<bf:instanceOf rdf:resource="http://example.org/journal/issn/{normalize-space(dc:source_issn)}"/>
 								</bf:Instance>
 							</bf:hasInstance>
 						</xsl:if>
@@ -57,38 +102,20 @@
 				</bf:Work>
 			</xsl:for-each>
 
-			<!-- Instancje -->
-			<xsl:for-each select="articles/article[generate-id() = generate-id(key('issueKey', concat(normalize-space(dc:source_issn), '|', normalize-space(dc:source_number)))[1])]">
-				<bf:Instance>
-					<xsl:attribute name="rdf:about">
-						<xsl:text>http://example.org/journal-instance/</xsl:text>
-						<xsl:value-of select="normalize-space(dc:source_issn)"/>
-						<xsl:text>/num/</xsl:text>
-						<xsl:value-of select="normalize-space(dc:source_number)"/>
-					</xsl:attribute>
-
-					<!-- Numer i data numeru -->
-					<bf:enumerationAndChronology>
-						<bf:EnumerationAndChronology>
-							<xsl:if test="normalize-space(dc:source_number)">
-								<bf:enumeration>
-									<xsl:value-of select="normalize-space(dc:source_number)"/>
-								</bf:enumeration>
-							</xsl:if>
-							<xsl:if test="normalize-space(dc:source_date)">
-								<bf:chronology>
-									<xsl:value-of select="normalize-space(dc:source_date)"/>
-								</bf:chronology>
-							</xsl:if>
-						</bf:EnumerationAndChronology>
-					</bf:enumerationAndChronology>
-
-					<bf:instanceOf rdf:resource="http://example.org/journal/issn/{normalize-space(dc:source_issn)}"/>
-				</bf:Instance>
-			</xsl:for-each>
-
 			<!-- Agenci -->
 			<xsl:for-each select="//dc:creator[generate-id() = generate-id(key('creatorKey', normalize-space(.))[1])]">
+				<bf:Agent>
+					<xsl:attribute name="rdf:about">
+						<xsl:text>http://example.org/agent/</xsl:text>
+						<xsl:value-of select="translate(normalize-space(.), ' ', '_')"/>
+					</xsl:attribute>
+					<rdfs:label>
+						<xsl:value-of select="normalize-space(.)"/>
+					</rdfs:label>
+				</bf:Agent>
+			</xsl:for-each>
+
+			<xsl:for-each select="//dc:contributor[generate-id() = generate-id(key('contributorKey', normalize-space(.))[1])]">
 				<bf:Agent>
 					<xsl:attribute name="rdf:about">
 						<xsl:text>http://example.org/agent/</xsl:text>
@@ -107,11 +134,13 @@
 	</xsl:template>
 
 	<xsl:template match="article">
+		<!-- Artykuł jako Work -->
 		<bf:Work>
 			<xsl:attribute name="rdf:about">
 				<xsl:text>http://example.org/article/</xsl:text>
 				<xsl:value-of select="normalize-space(dc:identifier)"/>
 			</xsl:attribute>
+
 			<bf:title>
 				<bf:Title>
 					<bf:mainTitle>
@@ -119,8 +148,6 @@
 					</bf:mainTitle>
 				</bf:Title>
 			</bf:title>
-
-			<bf:partOf rdf:resource="http://example.org/journal-instance/{normalize-space(dc:source_issn)}/num/{normalize-space(dc:source_number)}"/>
 
 			<!-- Autorzy -->
 			<xsl:for-each select="dc:creator">
@@ -134,16 +161,64 @@
 				</bf:contribution>
 			</xsl:for-each>
 
-			<!-- Strony artykułu -->
-			<xsl:if test="normalize-space(dc:pages)">
-				<bf:extent>
-					<bf:Extent>
-						<rdf:value>
-							<xsl:value-of select="normalize-space(dc:pages)"/>
-						</rdf:value>
-					</bf:Extent>
-				</bf:extent>
+			<!-- Współtwórcy -->
+			<xsl:for-each select="dc:contributor">
+				<bf:contribution>
+					<bf:Contribution>
+						<bf:agent rdf:resource="http://example.org/agent/{translate(normalize-space(.), ' ', '_')}"/>
+						<bf:role>
+							<bf:Role rdf:about="http://id.loc.gov/vocabulary/relators/ctb"/>
+						</bf:role>
+					</bf:Contribution>
+				</bf:contribution>
+			</xsl:for-each>
+
+			<!-- Typ -->
+			<xsl:if test="normalize-space(dc:type)">
+				<bf:genreForm>
+					<bf:GenreForm>
+						<rdfs:label>
+							<xsl:value-of select="normalize-space(dc:type)"/>
+						</rdfs:label>
+					</bf:GenreForm>
+				</bf:genreForm>
 			</xsl:if>
+
+			<!-- Instancja artykułu -->
+			<bf:hasInstance>
+				<bf:Instance>
+					<xsl:attribute name="rdf:about">
+						<xsl:text>http://example.org/instance/article/</xsl:text>
+						<xsl:value-of select="normalize-space(dc:identifier)"/>
+					</xsl:attribute>
+
+					<bf:instanceOf rdf:resource="http://example.org/article/{normalize-space(dc:identifier)}"/>
+					<bf:partOf rdf:resource="http://example.org/journal-instance/{normalize-space(dc:source_issn)}/num/{normalize-space(dc:source_number)}"/>
+
+					<xsl:if test="normalize-space(dc:pages)">
+						<bf:extent>
+							<bf:Extent>
+								<rdf:value>
+									<xsl:value-of select="normalize-space(dc:pages)"/>
+								</rdf:value>
+							</bf:Extent>
+						</bf:extent>
+					</xsl:if>
+
+					<xsl:if test="normalize-space(dc:relation)">
+						<bf:electronicLocator>
+							<xsl:value-of select="normalize-space(dc:relation)"/>
+						</bf:electronicLocator>
+					</xsl:if>
+
+					<xsl:if test="normalize-space(dc:open_access)">
+						<bf:usageAndAccessPolicy>
+							<xsl:value-of select="normalize-space(dc:open_access)"/>
+						</bf:usageAndAccessPolicy>
+					</xsl:if>
+
+				</bf:Instance>
+			</bf:hasInstance>
 		</bf:Work>
 	</xsl:template>
 </xsl:stylesheet>
